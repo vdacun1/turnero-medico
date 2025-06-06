@@ -4,7 +4,7 @@ package edu.up.models.entities;
  * Representa un médico en el sistema.
  * Hereda de Persona y utiliza el DNI como código identificador.
  */
-public class MedicoEntity extends Persona {
+public class MedicoEntity extends PersonaEntity {
 
   public MedicoEntity() {
     super();

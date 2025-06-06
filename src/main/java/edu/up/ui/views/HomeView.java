@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class HomeView implements IView {
-  public static final String NAME = "HOME";
+  private static final String NAME = "HOME";
+  private static final String TITLE = "Inicio";
   private final JPanel panel;
 
   public HomeView() {
@@ -30,12 +31,13 @@ public class HomeView implements IView {
 
   @Override
   public String getMenuTitle() {
-    return "Inicio";
+    return TITLE;
   }
 
   @Override
   public boolean hasPermission() {
     // Mock: siempre true por ahora - aquí iría la lógica real de permisos
+    // Aunque estoy analizando si debería resolverse a nivel global
     return true;
   }
 

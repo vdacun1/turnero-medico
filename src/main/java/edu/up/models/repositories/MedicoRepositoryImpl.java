@@ -25,21 +25,20 @@ public class MedicoRepositoryImpl extends AbstractRepository implements MedicoRe
   private static final String SQL_UPDATE_MEDICO = "UPDATE medicos SET nombre = ?, apellido = ?, dni = ? WHERE id = ?";
   private static final String SQL_DELETE_BY_ID = "DELETE FROM medicos WHERE id = ?";
   private static final String SQL_DELETE_BY_CODIGO = "DELETE FROM medicos WHERE dni = ?";
-
   // Error messages
-  private static final String MSG_FIND_ERROR = "Error finding medico by id: ";
-  private static final String MSG_FIND_BY_CODIGO_ERROR = "Error finding medico by codigo: ";
-  private static final String MSG_NOT_FOUND = "Medico not found with id: ";
-  private static final String MSG_NOT_FOUND_CODIGO = "Medico not found with codigo: ";
-  private static final String MSG_FIND_ALL_ERROR = "Error retrieving all medicos";
-  private static final String MSG_FIND_BY_NOMBRE_ERROR = "Error finding medicos by nombre";
-  private static final String MSG_NO_DATA = "No medicos found in the database";
-  private static final String MSG_NO_DATA_NOMBRE = "No medicos found with nombre containing: ";
-  private static final String MSG_SAVE_ERROR = "Error saving medico";
-  private static final String MSG_DELETE_ERROR = "Error deleting medico with id: ";
-  private static final String MSG_DELETE_BY_CODIGO_ERROR = "Error deleting medico with codigo: ";
-  private static final String MSG_NOT_FOUND_DELETE = "Cannot delete; medico not found with id: ";
-  private static final String MSG_NOT_FOUND_DELETE_CODIGO = "Cannot delete; medico not found with codigo: ";
+  private static final String MSG_FIND_ERROR = "Error buscando médico por id: ";
+  private static final String MSG_FIND_BY_CODIGO_ERROR = "Error buscando médico por código: ";
+  private static final String MSG_NOT_FOUND = "No se encontró médico con id: ";
+  private static final String MSG_NOT_FOUND_CODIGO = "No se encontró médico con código: ";
+  private static final String MSG_FIND_ALL_ERROR = "Error recuperando todos los médicos";
+  private static final String MSG_FIND_BY_NOMBRE_ERROR = "Error buscando médicos por nombre";
+  private static final String MSG_NO_DATA = "No se encontraron médicos en la base de datos";
+  private static final String MSG_NO_DATA_NOMBRE = "No se encontraron médicos con nombre que contenga: ";
+  private static final String MSG_SAVE_ERROR = "Error guardando médico";
+  private static final String MSG_DELETE_ERROR = "Error eliminando médico con id: ";
+  private static final String MSG_DELETE_BY_CODIGO_ERROR = "Error eliminando médico con código: ";
+  private static final String MSG_NOT_FOUND_DELETE = "No se puede eliminar; médico no encontrado con id: ";
+  private static final String MSG_NOT_FOUND_DELETE_CODIGO = "No se puede eliminar; médico no encontrado con código: ";
 
   /**
    * Constructor por defecto que utiliza MySQLConnectionManager.

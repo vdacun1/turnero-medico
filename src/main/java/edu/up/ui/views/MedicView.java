@@ -21,7 +21,8 @@ import edu.up.utils.Logger;
  * Actúa como coordinador entre los formularios y la lógica de negocio.
  */
 public class MedicView implements IView {
-  public static final String NAME = "MEDIC";
+  private static final String NAME = "MEDIC";
+  private static final String TITLE = "Médicos";
   private final JPanel panel;
   private final MedicoRepository medicoRepository;
   private final MedicForm medicForm;
@@ -203,7 +204,7 @@ public class MedicView implements IView {
 
   @Override
   public String getMenuTitle() {
-    return "Médicos";
+    return TITLE;
   }
 
   @Override

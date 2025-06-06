@@ -4,16 +4,16 @@ package edu.up.models.entities;
  * Clase base que representa una persona con datos básicos.
  * Contiene los campos comunes para todas las personas del sistema.
  */
-public abstract class Persona {
+public abstract class PersonaEntity {
   private Long id;
   private String nombre;
   private String apellido;
   private String dni;
 
-  public Persona() {
+  public PersonaEntity() {
   }
 
-  public Persona(String nombre, String apellido, String dni) {
+  public PersonaEntity(String nombre, String apellido, String dni) {
     this.nombre = nombre;
     this.apellido = apellido;
     this.dni = dni;

@@ -11,7 +11,7 @@ import edu.up.utils.Logger;
  * Maneja la configuración de conexión internamente usando DatabaseConfig.
  */
 public class MySQLConnectionManager implements IDBConnection {
-  private static MySQLConnectionManager instance;
+  private static final MySQLConnectionManager INSTANCE = new MySQLConnectionManager();
 
   /**
    * Constructor privado que usa la configuración de DatabaseConfig.
@@ -22,11 +22,8 @@ public class MySQLConnectionManager implements IDBConnection {
   /**
    * Obtiene la instancia singleton del connection manager.
    */
-  public static synchronized MySQLConnectionManager getInstance() {
-    if (instance == null) {
-      instance = new MySQLConnectionManager();
-    }
-    return instance;
+  public static MySQLConnectionManager getInstance() {
+    return INSTANCE;
   }
 
   @Override
