@@ -1,69 +1,49 @@
 package edu.up.ui.views;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.List;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableModel;
 
 import edu.up.models.entities.MedicoEntity;
 import edu.up.models.repositories.MedicoRepository;
 import edu.up.models.repositories.MedicoRepositoryImpl;
+import edu.up.ui.forms.medic.MedicForm;
+import edu.up.ui.forms.medic.MedicListForm;
 import edu.up.utils.Logger;
 
 /**
  * Vista para el CRUD de médicos del turnero.
- * Permite agregar, editar, eliminar y listar médicos.
+ * Actúa como coordinador entre los formularios y la lógica de negocio.
  */
 public class MedicView implements IView {
   public static final String NAME = "MEDIC";
   private final JPanel panel;
   private final MedicoRepository medicoRepository;
-  private final DefaultTableModel tableModel;
-  private final JTable medicosTable;
-  private final JTextField txtNombre;
-  private final JTextField txtApellido;
-  private final JTextField txtDni;
+  private final MedicForm medicForm;
+  private final MedicListForm medicListForm;
   private MedicoEntity selectedMedico = null;
 
   public MedicView() {
     this.medicoRepository = new MedicoRepositoryImpl();
     this.panel = new JPanel(new BorderLayout());
-
-    // Configurar modelo de tabla
-    String[] columnNames = { "ID", "Nombre", "Apellido", "DNI/Código" };
-    this.tableModel = new DefaultTableModel(columnNames, 0) {
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false; // Tabla no editable directamente
-      }
-    };
-
-    this.medicosTable = new JTable(tableModel);
-    this.txtNombre = new JTextField(20);
-    this.txtApellido = new JTextField(20);
-    this.txtDni = new JTextField(15);
+    this.medicForm = new MedicForm();
+    this.medicListForm = new MedicListForm();
 
     initializeUI();
+    setupEventListeners();
     loadMedicos();
   }
 
   private void initializeUI() {
     // Panel contenedor con márgenes
+    Integer margin = 40;
     JPanel containerPanel = new JPanel(new BorderLayout());
-    containerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    containerPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(margin, margin, margin, margin));
 
     // Título
     JLabel titleLabel = new JLabel("Gestión de Médicos", SwingConstants.CENTER);
@@ -75,137 +55,35 @@ public class MedicView implements IView {
     JPanel mainPanel = new JPanel(new BorderLayout(15, 0));
 
     // Formulario de entrada a la izquierda
-    JPanel formPanel = createFormPanel();
-    mainPanel.add(formPanel, BorderLayout.WEST);
+    mainPanel.add(medicForm.getPanel(), BorderLayout.WEST);
 
     // Tabla de médicos a la derecha
-    JPanel tablePanel = createTablePanel();
-    mainPanel.add(tablePanel, BorderLayout.CENTER);
+    mainPanel.add(medicListForm.getPanel(), BorderLayout.CENTER);
 
     containerPanel.add(mainPanel, BorderLayout.CENTER);
     panel.add(containerPanel, BorderLayout.CENTER);
   }
 
-  private JPanel createFormPanel() {
-    JPanel formPanel = new JPanel(new GridBagLayout());
+  private void setupEventListeners() {
+    // Configurar listeners del formulario
+    medicForm.setGuardarListener(e -> guardarMedico());
+    medicForm.setEliminarListener(e -> eliminarMedico());
+    medicForm.setLimpiarListener(e -> limpiarFormulario());
 
-    // Borde simple con título
-    formPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-        javax.swing.BorderFactory.createTitledBorder("Datos del Médico"),
-        javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-
-    // Establecer ancho preferido para el formulario
-    formPanel.setPreferredSize(new java.awt.Dimension(350, 0));
-
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(8, 8, 8, 8);
-
-    // Nombre
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.anchor = GridBagConstraints.WEST;
-    formPanel.add(new JLabel("Nombre:"), gbc);
-
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.weightx = 1.0;
-    formPanel.add(txtNombre, gbc);
-
-    // Apellido
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.weightx = 0.0;
-    formPanel.add(new JLabel("Apellido:"), gbc);
-
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.weightx = 1.0;
-    formPanel.add(txtApellido, gbc);
-
-    // DNI
-    gbc.gridx = 0;
-    gbc.gridy = 2;
-    gbc.fill = GridBagConstraints.NONE;
-    gbc.weightx = 0.0;
-    formPanel.add(new JLabel("DNI/Código:"), gbc);
-
-    gbc.gridx = 1;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.weightx = 1.0;
-    formPanel.add(txtDni, gbc);
-
-    // Panel de botones
-    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
-
-    // Botones estándar
-    JButton btnGuardar = new JButton("Guardar");
-    btnGuardar.addActionListener(e -> guardarMedico());
-
-    JButton btnEliminar = new JButton("Eliminar");
-    btnEliminar.addActionListener(e -> eliminarMedico());
-
-    JButton btnLimpiar = new JButton("Limpiar");
-    btnLimpiar.addActionListener(e -> limpiarFormulario());
-
-    buttonPanel.add(btnGuardar);
-    buttonPanel.add(btnEliminar);
-    buttonPanel.add(btnLimpiar);
-
-    gbc.gridx = 0;
-    gbc.gridy = 3;
-    gbc.gridwidth = 2;
-    gbc.fill = GridBagConstraints.HORIZONTAL;
-    gbc.weightx = 1.0;
-    gbc.insets = new Insets(15, 0, 0, 0);
-    formPanel.add(buttonPanel, gbc);
-
-    return formPanel;
-  }
-
-  private JPanel createTablePanel() {
-    JPanel tablePanel = new JPanel(new BorderLayout());
-
-    // Borde simple con título
-    tablePanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-        javax.swing.BorderFactory.createTitledBorder("Lista de Médicos"),
-        javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-
-    // Configurar tabla
-    medicosTable.getSelectionModel().addListSelectionListener(e -> {
+    // Configurar listeners de la lista
+    medicListForm.setSelectionListener(e -> {
       if (!e.getValueIsAdjusting()) {
-        int selectedRow = medicosTable.getSelectedRow();
-        if (selectedRow >= 0) {
-          cargarMedicoEnFormulario(selectedRow);
-        }
+        cargarMedicoEnFormulario();
       }
     });
-    JScrollPane scrollPane = new JScrollPane(medicosTable);
-    scrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-    tablePanel.add(scrollPane, BorderLayout.CENTER);
-
-    // Panel para el botón de refrescar
-    JPanel refreshPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-
-    // Botón de refrescar estándar
-    JButton btnRefrescar = new JButton("Refrescar Lista");
-    btnRefrescar.addActionListener(e -> loadMedicos());
-    refreshPanel.add(btnRefrescar);
-
-    tablePanel.add(refreshPanel, BorderLayout.SOUTH);
-
-    return tablePanel;
+    medicListForm.setRefrescarListener(e -> loadMedicos());
   }
 
   private void guardarMedico() {
     try {
       Logger.info("MedicView", "Iniciando guardado de médico");
 
-      String nombre = txtNombre.getText().trim();
-      String apellido = txtApellido.getText().trim();
-      String dni = txtDni.getText().trim();
-
-      if (nombre.isEmpty() || apellido.isEmpty() || dni.isEmpty()) {
+      if (!medicForm.validarCampos()) {
         Logger.warn("MedicView", "Intento de guardar médico con campos vacíos");
         JOptionPane.showMessageDialog(panel,
             "Por favor complete todos los campos",
@@ -213,7 +91,11 @@ public class MedicView implements IView {
         return;
       }
 
-      MedicoEntity medico = new MedicoEntity(nombre, apellido, dni);
+      MedicoEntity medico = new MedicoEntity(
+          medicForm.getNombre(),
+          medicForm.getApellido(),
+          medicForm.getDni());
+
       if (selectedMedico != null) {
         medico.setId(selectedMedico.getId());
         Logger.info("MedicView", "Actualizando médico existente con ID: " + selectedMedico.getId());
@@ -240,7 +122,7 @@ public class MedicView implements IView {
   }
 
   private void eliminarMedico() {
-    int selectedRow = medicosTable.getSelectedRow();
+    int selectedRow = medicListForm.getSelectedRow();
     if (selectedRow < 0) {
       JOptionPane.showMessageDialog(panel,
           "Por favor seleccione un médico de la tabla",
@@ -254,7 +136,7 @@ public class MedicView implements IView {
 
     if (confirmResult == JOptionPane.YES_OPTION) {
       try {
-        Long id = (Long) tableModel.getValueAt(selectedRow, 0);
+        Long id = (Long) medicListForm.getValueAt(selectedRow, 0);
         medicoRepository.delete(id);
 
         JOptionPane.showMessageDialog(panel,
@@ -272,47 +154,24 @@ public class MedicView implements IView {
     }
   }
 
-  private void cargarMedicoEnFormulario(int rowIndex) {
-    Long id = (Long) tableModel.getValueAt(rowIndex, 0);
-    String nombre = (String) tableModel.getValueAt(rowIndex, 1);
-    String apellido = (String) tableModel.getValueAt(rowIndex, 2);
-    String dni = (String) tableModel.getValueAt(rowIndex, 3);
-
-    txtNombre.setText(nombre);
-    txtApellido.setText(apellido);
-    txtDni.setText(dni);
-
-    selectedMedico = new MedicoEntity(nombre, apellido, dni);
-    selectedMedico.setId(id);
+  private void cargarMedicoEnFormulario() {
+    selectedMedico = medicListForm.getMedicoFromSelectedRow();
+    medicForm.cargarMedico(selectedMedico);
   }
 
   private void limpiarFormulario() {
-    txtNombre.setText("");
-    txtApellido.setText("");
-    txtDni.setText("");
+    medicForm.limpiarCampos();
     selectedMedico = null;
-    medicosTable.clearSelection();
+    medicListForm.clearSelection();
   }
 
   private void loadMedicos() {
     try {
       Logger.info("MedicView", "Cargando lista de médicos");
 
-      // Limpiar tabla
-      tableModel.setRowCount(0);
-
       // Cargar médicos
       List<MedicoEntity> medicos = medicoRepository.findAll();
-
-      for (MedicoEntity medico : medicos) {
-        Object[] row = {
-            medico.getId(),
-            medico.getNombre(),
-            medico.getApellido(),
-            medico.getDni()
-        };
-        tableModel.addRow(row);
-      }
+      medicListForm.cargarMedicos(medicos);
 
       Logger.info("MedicView", "Lista de médicos cargada exitosamente");
 
@@ -322,6 +181,7 @@ public class MedicView implements IView {
       // Si no hay datos, mostrar tabla vacía sin error
       if (e.getMessage().contains("No medicos found")) {
         Logger.warn("MedicView", "No se encontraron médicos en la base de datos");
+        medicListForm.limpiarTabla();
         // Tabla ya está vacía, no mostrar error
       } else {
         JOptionPane.showMessageDialog(panel,
