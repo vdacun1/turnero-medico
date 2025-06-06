@@ -47,11 +47,9 @@ public class MainFrame extends JFrame {
     this.contentPanel = new JPanel(cardLayout);
 
     initializeViewsAndCards();
-    initializeWindow();
-
-    // Inicializar componentes después de tener las vistas
+    initializeWindow(); // Inicializar componentes después de tener las vistas
     this.headerSection = new HeaderSection(getMainViews());
-    this.statusSection = new StatusSection(false, true, APP_VERSION, DEMO_USER);
+    this.statusSection = new StatusSection(APP_VERSION, DEMO_USER);
 
     setupComponents();
     configureMenuActionsOptimized();
