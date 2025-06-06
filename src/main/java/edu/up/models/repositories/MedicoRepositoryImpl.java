@@ -42,6 +42,8 @@ public class MedicoRepositoryImpl extends AbstractRepository implements MedicoRe
 
   /**
    * Constructor por defecto que utiliza MySQLConnectionManager.
+   * Aún estoy pensando como desacoplar las implementaciones
+   * de MySQL, y hacer que los repositorios sean más abstractos.
    */
   public MedicoRepositoryImpl() {
     super();

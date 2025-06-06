@@ -7,6 +7,8 @@ package edu.up.controllers.infrastructure;
 public class DatabaseConfig {
 
   // Configuración de conexión a MySQL
+  // Esto se levantará de variables de entorno en un futuro,
+  // pero por ahora se define aquí para simplificar el desarrollo local.
   private static final String DB_HOST = "localhost";
   private static final String DB_PORT = "3306";
   private static final String DB_NAME = "turnero_medico";
@@ -14,6 +16,8 @@ public class DatabaseConfig {
   private static final String DB_PASSWORD = "123456";
 
   // URL completa de conexión
+  // Me queda pendiente abstraer todo lo que es la conexión y desacoplar del motor
+  // de base de datos
   private static final String DB_URL = String.format(
       "jdbc:mysql://%s:%s/%s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
       DB_HOST, DB_PORT, DB_NAME);
