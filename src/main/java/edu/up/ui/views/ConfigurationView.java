@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 public class ConfigurationView implements IView {
-  public static final String NAME = "CONFIG";
+  private static final String NAME = "CONFIG";
+  private static final String TITLE = "Configuración";
   private final JPanel panel;
 
   public ConfigurationView() {
@@ -30,12 +31,14 @@ public class ConfigurationView implements IView {
 
   @Override
   public String getMenuTitle() {
-    return "Configuración";
+    return TITLE;
   }
 
   @Override
   public boolean hasPermission() {
     // Mock: siempre true por ahora - aquí iría la lógica real de permisos
+    // Aunque estoy analizando si debería resolverse a nivel global
+    // Dejo en false para probar que no se muestre en el menú
     return false;
   }
 

@@ -10,7 +10,8 @@ import javax.swing.JPanel;
  * No renderiza contenido, solo actúa como contenedor de submenús.
  */
 public class AdministrationView implements IView {
-  public static final String NAME = "ADMIN";
+  private static final String NAME = "ADMIN";
+  private static final String TITLE = "Administración";
   private final List<IView> subViews;
 
   public AdministrationView() {
@@ -30,12 +31,13 @@ public class AdministrationView implements IView {
 
   @Override
   public String getMenuTitle() {
-    return "Administración";
+    return TITLE;
   }
 
   @Override
   public boolean hasPermission() {
     // Mock: siempre true por ahora - aquí iría la lógica real de permisos
+    // Aunque estoy analizando si debería resolverse a nivel global
     return true;
   }
 
