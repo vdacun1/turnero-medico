@@ -54,7 +54,7 @@ Los parámetros de conexión están externalizados en:
 src/main/resources/application.properties
 ```
 
-## 🏛️ Patrones de Diseño Implementados
+## Patrones de Diseño Implementados
 
 ### 1. **MVC (Model-View-Controller)**
 - Separación clara de responsabilidades
