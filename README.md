@@ -1,111 +1,135 @@
 # Sistema de Turnero Médico
 
 ## Descripción
-Este proyecto es una aplicación Java con interfaz gráfica (Swing) que implementa un sistema de gestión de turnos médicos. Actualmente, la funcionalidad principal implementada es el ABM (Alta, Baja, Modificación) de médicos.
+Sistema de gestión de turnos médicos desarrollado en Java 21 con interfaz gráfica Swing. Implementa una arquitectura MVC robusta con separación de capas, siguiendo principios SOLID y mejores prácticas de desarrollo.
 
-## Funcionalidad Implementada
+## Arquitectura del Sistema
 
-### Entidad Médico
-La entidad que está completamente funcional es **Médico**. Esta permite realizar todas las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre los datos de los médicos.
+### Estructura de Capas
 
-### Acceso a la Funcionalidad
-Para acceder a la gestión de médicos:
-1. Ejecutar la aplicación
-2. Navegar al menú **Administración**
-3. Seleccionar **Médicos**
+#### **Capa de Presentación (UI)**
+- **Ubicación**: `src/main/java/edu/up/ui/`
+- **Responsabilidad**: Interfaz gráfica y experiencia de usuario
+- **Componentes**:
+  - `MainFrame.java` - Ventana principal con navegación
+  - `views/` - Vistas específicas por funcionalidad
+  - `forms/` - Formularios de entrada de datos
+  - `sections/` - Componentes reutilizables de UI
 
-Desde esta sección podrás:
-- Agregar nuevos médicos
-- Consultar médicos existentes
-- Modificar información de médicos
-- Eliminar médicos del sistema
+#### **Capa de Control (Controllers)**
+- **Ubicación**: `src/main/java/edu/up/controllers/`
+- **Responsabilidad**: Lógica de negocio y coordinación
+- **Componentes**:
+  - `MedicController.java` - Controlador de médicos
+  - `service/` - Capa de servicios de negocio
+  - `dao/` - Capa de acceso a datos
+  - `infrastructure/` - Configuración y conexiones
+  - `exceptions/` - Excepciones personalizadas
 
-## Configuración de Base de Datos
+#### **Capa de Modelo (Models)**
+- **Ubicación**: `src/main/java/edu/up/models/`
+- **Responsabilidad**: Entidades y estructura de datos
+- **Componentes**:
+  - `entities/` - Entidades del dominio
 
-### Configuración de Conexión
-Los parámetros de conexión a la base de datos se encuentran en la clase `DatabaseConfig.java`:
+#### **Utilidades**
+- **Ubicación**: `src/main/java/edu/up/utils/`
+- **Responsabilidad**: Funcionalidades transversales
+- **Componentes**:
+  - `Logger.java` - Sistema de logging
+
+## Tecnologías y Dependencias
+- **Java 21** - Lenguaje de programación
+- **Swing** - Framework de interfaz gráfica
+- **MySQL 8.0** - Base de datos relacional
+- **JDBC** - Conectividad con base de datos
+- **Maven** - Gestión de dependencias y construcción
+
+## Configuración del Sistema
+
+### Configuración de Base de Datos
+
+Los parámetros de conexión están externalizados en:
 ```
-src/main/java/edu/up/controllers/infrastructure/DatabaseConfig.java
-```
-
-**Configuración actual:**
-- Host: `localhost`
-- Puerto: `3306`
-- Base de datos: `turnero_medico`
-- Usuario: `root`
-- Contraseña: `123456`
-
-### Modificar Configuración
-Para cambiar los parámetros de conexión, edita las constantes en `DatabaseConfig.java`:
-```java
-private static final String DB_HOST = "localhost";
-private static final String DB_PORT = "3306";
-private static final String DB_NAME = "turnero_medico";
-private static final String DB_USER = "root";
-private static final String DB_PASSWORD = "123456";
-```
-
-### Inicialización de Base de Datos
-El script para crear la estructura de la base de datos se encuentra en:
-```
-database_setup.sql
-```
-
-**Para inicializar la base de datos:**
-1. Asegúrate de tener MySQL instalado y funcionando
-2. Crea la base de datos `turnero_medico`
-3. Ejecuta el script `database_setup.sql` en tu cliente MySQL
-
-**Comando MySQL:**
-```sql
-CREATE DATABASE turnero_medico;
-USE turnero_medico;
-SOURCE database_setup.sql;
+src/main/resources/application.properties
 ```
 
-## Estructura del Proyecto
+## 🏛️ Patrones de Diseño Implementados
 
-### Arquitectura
-El proyecto sigue una arquitectura en capas:
-- **UI (Interfaz de Usuario)**: Paquete `ui` con formularios Swing
-- **Controladores**: Paquete `controllers` con lógica de negocio
-- **Modelos**: Paquete `models` con entidades y repositorios
-- **Infraestructura**: Configuración de base de datos y conexiones
+### 1. **MVC (Model-View-Controller)**
+- Separación clara de responsabilidades
+- Bajo acoplamiento entre capas
+- Alta cohesión dentro de cada capa
 
-### Tecnologías Utilizadas
-- **Java**: Lenguaje de programación principal
-- **Swing**: Framework para la interfaz gráfica
-- **MySQL**: Base de datos relacional
-- **JDBC**: Conectividad con base de datos
-- **Maven**: Gestión de dependencias y construcción
+### 2. **DAO (Data Access Object)**
+- Abstracción del acceso a datos
+- Interfaces para flexibilidad
+- Implementaciones específicas por tecnología
 
-## Ejecutar el Proyecto
+### 3. **Service Layer**
+- Lógica de negocio centralizada
+- Transacciones y validaciones
+- Reutilización de componentes
+
+### 4. **Dependency Injection**
+- Inyección manual de dependencias
+- Inversión de control
+- Facilita mantenimiento
+
+### 5. **Singleton**
+- `DatabaseConfig` - Configuración única
+- `MySQLConnectionManager` - Gestión de conexiones
+- `Logger` - Sistema de logging
+
+## Ejecución del Proyecto
 
 ### Prerrequisitos
-1. Java JDK 21
-2. MySQL Server
-3. Maven
+1. **Java JDK 21**
+2. **MySQL Server**
+3. **Maven**
 
-### Pasos para Ejecutar
-1. **Configurar base de datos:**
-   - Instalar MySQL
-   - Crear base de datos `turnero_medico`
-   - Ejecutar `database_setup.sql`
 
-2. **Configurar conexión:**
-   - Verificar/modificar parámetros en `DatabaseConfig.java`
+#### Compilar y Ejecutar
+```bash
+# Limpiar y compilar
+mvn clean compile
 
-3. **Compilar y ejecutar:**
-   ```bash
-   mvn clean compile
-   mvn exec:java "-Dexec.mainClass=edu.up.App"
-   ```
+# Ejecutar aplicación
+mvn exec:java
+```
 
-## Notas para el Profesor
+### Docker (Opcional)
+```bash
+# Iniciar MySQL con Docker
+docker-compose up -d
 
-- ✅ **Entidad Médico**: Completamente funcional con ABM
-- ✅ **Base de datos**: Configuración centralizada en `DatabaseConfig.java`
-- ✅ **Script SQL**: Disponible en `database_setup.sql`
-- ✅ **Interfaz gráfica**: Acceso vía menú Administración → Médicos
+# La aplicación se conectará automáticamente
+mvn exec:java
+```
 
-La aplicación está lista para demostrar la funcionalidad de gestión de médicos. Todas las operaciones CRUD están implementadas y funcionando correctamente.
+## Funcionalidades Implementadas
+
+### Gestión de Médicos (CRUD Completo)
+- **Crear**: Agregar nuevos médicos al sistema
+- **Leer**: Consultar médicos por ID, código o nombre
+- **Actualizar**: Modificar información existente
+- **Eliminar**: Remover médicos del sistema
+
+### Interfaz de Usuario
+- Navegación por menús
+- Formularios de entrada
+- Listados con selección
+- Mensajes de confirmación y error
+
+## Acceso a Funcionalidades
+
+### Navegación Principal
+1. **Ejecutar aplicación** → `mvn exec:java`
+2. **Menú Administración** → Clic en "Administración"
+3. **Gestión Médicos** → Clic en "Médicos"
+
+### Operaciones Disponibles
+- **Agregar Médico**: Botón "Nuevo" → Completar formulario
+- **Editar Médico**: Seleccionar de lista → Botón "Editar"
+- **Eliminar Médico**: Seleccionar de lista → Botón "Eliminar"
+- **Buscar Médico**: Campo de búsqueda → Enter

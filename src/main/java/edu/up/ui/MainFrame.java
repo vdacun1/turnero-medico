@@ -11,6 +11,11 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import edu.up.controllers.MedicController;
+import edu.up.controllers.dao.IMedicDAO;
+import edu.up.controllers.dao.MedicDAOImpl;
+import edu.up.controllers.service.IMedicService;
+import edu.up.controllers.service.MedicServiceImpl;
 import edu.up.ui.sections.HeaderSection;
 import edu.up.ui.sections.StatusSection;
 import edu.up.ui.views.AdministrationView;
@@ -62,24 +67,26 @@ public class MainFrame extends JFrame {
    * @return La vista inicial de la aplicación
    */
   private IView initializeViewsAndCards(List<IView> allViews, Map<String, IView> viewMap, JPanel contentPanel) {
-    // Crear vistas principales
-    List<IView> mainViews = createMainViews();
+    // Crear instancias de las vistas principales
+    HomeView homeView = new HomeView();
+    ConfigurationView configView = new ConfigurationView();
+    AdministrationView adminView = new AdministrationView();
 
-    // Procesar todas las vistas en un solo recorrido
-    for (IView view : mainViews) {
-      // Agregar vista principal
-      addViewToCollections(view, allViews, viewMap, contentPanel);
+    // Inicializar DAOs y servicios
+    IMedicDAO medicDAO = new MedicDAOImpl();
+    IMedicService medicService = new MedicServiceImpl(medicDAO);
+    MedicController medicController = new MedicController(medicService);
+    MedicView medicView = new MedicView(medicController);
 
-      // Procesar subvistas si existen
-      if (view.hasSubViews()) {
-        for (IView subView : view.getSubViews()) {
-          addViewToCollections(subView, allViews, viewMap, contentPanel);
-        }
-      }
-    }
+    // Agregar la vista de médicos a la vista de administración
+    adminView.addView(medicView);
 
-    // Retornar la primera vista como inicial (que será HomeView)
-    return mainViews.get(0);
+    // Agregar todas las vistas a las colecciones
+    addViewToCollections(homeView, allViews, viewMap, contentPanel);
+    addViewToCollections(configView, allViews, viewMap, contentPanel);
+    addViewToCollections(adminView, allViews, viewMap, contentPanel);
+
+    return homeView;
   }
 
   /**
@@ -105,31 +112,18 @@ public class MainFrame extends JFrame {
   }
 
   /**
-   * Crea las vistas principales de la aplicación.
-   */
-  private List<IView> createMainViews() {
-    List<IView> mainViews = new ArrayList<>();
-
-    // Vistas principales - HomeView será la primera (vista inicial)
-    HomeView homeView = new HomeView();
-    mainViews.add(homeView);
-    mainViews.add(new ConfigurationView());
-
-    // Vista de administración con subvistas
-    AdministrationView administrationView = new AdministrationView();
-    administrationView.addView(new MedicView());
-    mainViews.add(administrationView);
-
-    return mainViews;
-  }
-
-  /**
    * Agrega una vista a todas las colecciones necesarias.
    */
   private void addViewToCollections(IView view, List<IView> allViews, Map<String, IView> viewMap, JPanel contentPanel) {
     allViews.add(view);
     viewMap.put(view.getName(), view);
     contentPanel.add(view.getPanel(), view.getName());
+    // Agregar recursivamente sub-vistas
+    if (view.hasSubViews()) {
+        for (IView subView : view.getSubViews()) {
+            addViewToCollections(subView, allViews, viewMap, contentPanel);
+        }
+    }
   }
 
   /**
@@ -189,16 +183,12 @@ public class MainFrame extends JFrame {
    * @return true si es subvista, false en caso contrario
    */
   private boolean isSubView(IView view, List<IView> allViews) {
-    String viewName = view.getName();
-
     for (IView mainView : allViews) {
-      if (!mainView.hasSubViews()) {
-        continue;
-      }
-
-      for (IView subView : mainView.getSubViews()) {
-        if (viewName.equals(subView.getName())) {
-          return true;
+      if (mainView.hasSubViews()) {
+        for (IView subView : mainView.getSubViews()) {
+          if (subView == view) {
+            return true;
+          }
         }
       }
     }
