@@ -7,7 +7,7 @@
 
   <groupId>edu.up</groupId>
   <artifactId>tp</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-EXAMEN FINAL</version>
 
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
@@ -53,6 +53,9 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.1.0</version>
+        <configuration>
+          <mainClass>edu.up.App</mainClass>
+        </configuration>
       </plugin>
 
     </plugins>

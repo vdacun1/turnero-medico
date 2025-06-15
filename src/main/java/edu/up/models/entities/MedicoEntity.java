@@ -1,35 +1,30 @@
 package edu.up.models.entities;
 
 /**
- * Representa un médico en el sistema.
- * Hereda de Persona y utiliza el DNI como código identificador.
+ * Entidad que representa un médico en el sistema.
+ * Hereda de PersonaEntity para los datos básicos.
+ * El código del médico es el mismo que su DNI.
  */
 public class MedicoEntity extends PersonaEntity {
 
-  public MedicoEntity() {
-    super();
-  }
+    public MedicoEntity() {
+        super();
+    }
 
-  public MedicoEntity(String nombre, String apellido, String dni) {
-    super(nombre, apellido, dni);
-  }
+    public MedicoEntity(String nombre, String apellido, String dni) {
+        super(nombre, apellido, dni);
+    }
 
-  /**
-   * Retorna el DNI como código del médico.
-   */
-  public String getCodigo() {
-    return getDni();
-  }
+    public String getCodigo() {
+        return getDni(); // El código es el mismo que el DNI
+    }
 
-  /**
-   * Establece el código del médico (actualiza el DNI).
-   */
-  public void setCodigo(String codigo) {
-    setDni(codigo);
-  }
+    public void setCodigo(String codigo) {
+        setDni(codigo); // Al establecer el código, también se establece el DNI
+    }
 
-  @Override
-  public String toString() {
-    return "Dr./Dra. " + getNombreCompleto() + " (Código: " + getCodigo() + ")";
-  }
+    @Override
+    public String toString() {
+        return getNombreCompleto() + " (DNI: " + getDni() + ")";
+    }
 }

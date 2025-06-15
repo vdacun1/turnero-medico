@@ -9,9 +9,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import edu.up.controllers.MedicController;
+import edu.up.controllers.exceptions.NoDataFoundException;
 import edu.up.models.entities.MedicoEntity;
-import edu.up.models.repositories.MedicoRepository;
-import edu.up.models.repositories.MedicoRepositoryImpl;
 import edu.up.ui.forms.medic.MedicForm;
 import edu.up.ui.forms.medic.MedicListForm;
 import edu.up.utils.Logger;
@@ -24,13 +24,13 @@ public class MedicView implements IView {
   private static final String NAME = "MEDIC";
   private static final String TITLE = "Médicos";
   private final JPanel panel;
-  private final MedicoRepository medicoRepository;
+  private final MedicController medicController;
   private final MedicForm medicForm;
   private final MedicListForm medicListForm;
   private MedicoEntity selectedMedico = null;
 
-  public MedicView() {
-    this.medicoRepository = new MedicoRepositoryImpl();
+  public MedicView(MedicController medicController) {
+    this.medicController = medicController;
     this.panel = new JPanel(new BorderLayout());
     this.medicForm = new MedicForm();
     this.medicListForm = new MedicListForm();
@@ -104,7 +104,7 @@ public class MedicView implements IView {
         Logger.info("MedicView", "Creando nuevo médico");
       }
 
-      medicoRepository.save(medico);
+      medicController.save(medico);
 
       Logger.info("MedicView", "Médico guardado exitosamente");
       JOptionPane.showMessageDialog(panel,
@@ -138,7 +138,7 @@ public class MedicView implements IView {
     if (confirmResult == JOptionPane.YES_OPTION) {
       try {
         Long id = (Long) medicListForm.getValueAt(selectedRow, 0);
-        medicoRepository.delete(id);
+        medicController.delete(id);
 
         JOptionPane.showMessageDialog(panel,
             "Médico eliminado exitosamente",
@@ -171,24 +171,19 @@ public class MedicView implements IView {
       Logger.info("MedicView", "Cargando lista de médicos");
 
       // Cargar médicos
-      List<MedicoEntity> medicos = medicoRepository.findAll();
+      List<MedicoEntity> medicos = medicController.findAll();
       medicListForm.cargarMedicos(medicos);
 
       Logger.info("MedicView", "Lista de médicos cargada exitosamente");
 
+    } catch (NoDataFoundException e) {
+      Logger.warn("MedicView", "No se encontraron médicos en la base de datos");
+      medicListForm.limpiarTabla();
     } catch (Exception e) {
       Logger.error("MedicView", "Error al cargar médicos", e);
-
-      // Si no hay datos, mostrar tabla vacía sin error
-      if (e.getMessage().contains("No medicos found")) {
-        Logger.warn("MedicView", "No se encontraron médicos en la base de datos");
-        medicListForm.limpiarTabla();
-        // Tabla ya está vacía, no mostrar error
-      } else {
-        JOptionPane.showMessageDialog(panel,
-            "Error al cargar médicos: " + e.getMessage(),
-            "Error", JOptionPane.ERROR_MESSAGE);
-      }
+      JOptionPane.showMessageDialog(panel,
+          "Error al cargar médicos: " + e.getMessage(),
+          "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
 
