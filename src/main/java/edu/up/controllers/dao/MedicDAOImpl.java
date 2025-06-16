@@ -67,6 +67,8 @@ public class MedicDAOImpl implements IMedicDAO {
             stmt.setString(1, medico.getNombre());
             stmt.setString(2, medico.getApellido());
             stmt.setString(3, medico.getDni());
+            stmt.setString(4, medico.getUsuario());
+            stmt.setString(5, medico.getContrasena());
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
@@ -87,7 +89,9 @@ public class MedicDAOImpl implements IMedicDAO {
             stmt.setString(1, medico.getNombre());
             stmt.setString(2, medico.getApellido());
             stmt.setString(3, medico.getDni());
-            stmt.setLong(4, medico.getId());
+            stmt.setString(4, medico.getUsuario());
+            stmt.setString(5, medico.getContrasena());
+            stmt.setLong(6, medico.getId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             Logger.error(getClass().getSimpleName(), "Error al actualizar médico: " + medico, e);
@@ -164,6 +168,8 @@ public class MedicDAOImpl implements IMedicDAO {
         medico.setNombre(rs.getString("nombre"));
         medico.setApellido(rs.getString("apellido"));
         medico.setDni(rs.getString("dni"));
+        medico.setUsuario(rs.getString("usuario"));
+        medico.setContrasena(rs.getString("contrasena"));
         return medico;
     }
 } 

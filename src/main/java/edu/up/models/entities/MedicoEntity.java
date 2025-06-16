@@ -15,12 +15,21 @@ public class MedicoEntity extends PersonaEntity {
         super(nombre, apellido, dni);
     }
 
+    public MedicoEntity(String nombre, String apellido, String dni, String usuario, String contrasena) {
+        super(nombre, apellido, dni, usuario, contrasena);
+    }
+
     public String getCodigo() {
         return getDni(); // El código es el mismo que el DNI
     }
 
     public void setCodigo(String codigo) {
         setDni(codigo); // Al establecer el código, también se establece el DNI
+    }
+
+    @Override
+    public String getTipoPersona() {
+        return "Médico";
     }
 
     @Override

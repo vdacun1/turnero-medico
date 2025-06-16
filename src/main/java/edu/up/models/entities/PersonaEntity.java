@@ -9,6 +9,8 @@ public abstract class PersonaEntity {
   private String nombre;
   private String apellido;
   private String dni;
+  private String usuario;
+  private String contrasena;
 
   public PersonaEntity() {
   }
@@ -17,6 +19,14 @@ public abstract class PersonaEntity {
     this.nombre = nombre;
     this.apellido = apellido;
     this.dni = dni;
+  }
+
+  public PersonaEntity(String nombre, String apellido, String dni, String usuario, String contrasena) {
+    this.nombre = nombre;
+    this.apellido = apellido;
+    this.dni = dni;
+    this.usuario = usuario;
+    this.contrasena = contrasena;
   }
 
   public Long getId() {
@@ -51,12 +61,33 @@ public abstract class PersonaEntity {
     this.dni = dni;
   }
 
+  public String getUsuario() {
+    return usuario;
+  }
+
+  public void setUsuario(String usuario) {
+    this.usuario = usuario;
+  }
+
+  public String getContrasena() {
+    return contrasena;
+  }
+
+  public void setContrasena(String contrasena) {
+    this.contrasena = contrasena;
+  }
+
   /**
    * Retorna el nombre completo de la persona.
    */
   public String getNombreCompleto() {
     return nombre + " " + apellido;
   }
+
+  /**
+   * Retorna el tipo de persona (para ser sobrescrito por las clases hijas).
+   */
+  public abstract String getTipoPersona();
 
   @Override
   public String toString() {

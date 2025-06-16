@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import edu.up.controllers.dto.MedicoDTO;
 import edu.up.models.entities.MedicoEntity;
 
 /**
@@ -137,6 +138,16 @@ public class MedicForm {
   }
 
   public void cargarMedico(MedicoEntity medico) {
+    if (medico != null) {
+      setNombre(medico.getNombre());
+      setApellido(medico.getApellido());
+      setDni(medico.getDni());
+    } else {
+      limpiarCampos();
+    }
+  }
+
+  public void cargarMedicoDTO(MedicoDTO medico) {
     if (medico != null) {
       setNombre(medico.getNombre());
       setApellido(medico.getApellido());
