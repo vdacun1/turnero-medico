@@ -10,15 +10,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import edu.up.controllers.MedicController;
-import edu.up.controllers.exceptions.NoDataFoundException;
-import edu.up.models.entities.MedicoEntity;
+import edu.up.controllers.dto.MedicoDTO;
 import edu.up.ui.forms.medic.MedicForm;
 import edu.up.ui.forms.medic.MedicListForm;
-import edu.up.utils.Logger;
 
 /**
  * Vista para el CRUD de médicos del turnero.
  * Actúa como coordinador entre los formularios y la lógica de negocio.
+ * Usa DTOs para separar la vista del modelo.
  */
 public class MedicView implements IView {
   private static final String NAME = "MEDIC";
@@ -27,7 +26,7 @@ public class MedicView implements IView {
   private final MedicController medicController;
   private final MedicForm medicForm;
   private final MedicListForm medicListForm;
-  private MedicoEntity selectedMedico = null;
+  private MedicoDTO selectedMedico = null;
 
   public MedicView(MedicController medicController) {
     this.medicController = medicController;
@@ -81,43 +80,37 @@ public class MedicView implements IView {
   }
 
   private void guardarMedico() {
-    try {
-      Logger.info("MedicView", "Iniciando guardado de médico");
-
-      if (!medicForm.validarCampos()) {
-        Logger.warn("MedicView", "Intento de guardar médico con campos vacíos");
-        JOptionPane.showMessageDialog(panel,
-            "Por favor complete todos los campos",
-            "Error", JOptionPane.ERROR_MESSAGE);
-        return;
-      }
-
-      MedicoEntity medico = new MedicoEntity(
-          medicForm.getNombre(),
-          medicForm.getApellido(),
-          medicForm.getDni());
-
-      if (selectedMedico != null) {
-        medico.setId(selectedMedico.getId());
-        Logger.info("MedicView", "Actualizando médico existente con ID: " + selectedMedico.getId());
-      } else {
-        Logger.info("MedicView", "Creando nuevo médico");
-      }
-
-      medicController.save(medico);
-
-      Logger.info("MedicView", "Médico guardado exitosamente");
+    // Validar campos en la vista
+    if (!medicForm.validarCampos()) {
       JOptionPane.showMessageDialog(panel,
-          "Médico guardado exitosamente",
-          "Éxito", JOptionPane.INFORMATION_MESSAGE);
+          "Por favor complete todos los campos",
+          "Error", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
 
+    // Crear DTO con los datos del formulario
+    MedicoDTO medico = new MedicoDTO(
+        medicForm.getNombre(),
+        medicForm.getApellido(),
+        medicForm.getDni());
+
+    // Si estamos editando, agregar el ID
+    if (selectedMedico != null) {
+      medico.setId(selectedMedico.getId());
+    }
+
+    // Delegar la operación al controlador
+    MedicController.OperationResult resultado = medicController.guardarMedico(medico);
+
+    if (resultado.isExitoso()) {
+      JOptionPane.showMessageDialog(panel,
+          resultado.getMensaje(),
+          "Éxito", JOptionPane.INFORMATION_MESSAGE);
       limpiarFormulario();
       loadMedicos();
-
-    } catch (Exception e) {
-      Logger.error("MedicView", "Error al guardar médico", e);
+    } else {
       JOptionPane.showMessageDialog(panel,
-          "Error al guardar médico: " + e.getMessage(),
+          resultado.getMensaje(),
           "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
@@ -136,28 +129,26 @@ public class MedicView implements IView {
         "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
     if (confirmResult == JOptionPane.YES_OPTION) {
-      try {
-        Long id = (Long) medicListForm.getValueAt(selectedRow, 0);
-        medicController.delete(id);
+      Long id = (Long) medicListForm.getValueAt(selectedRow, 0);
+      MedicController.OperationResult resultado = medicController.eliminarMedico(id);
 
+      if (resultado.isExitoso()) {
         JOptionPane.showMessageDialog(panel,
-            "Médico eliminado exitosamente",
+            resultado.getMensaje(),
             "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
         limpiarFormulario();
         loadMedicos();
-
-      } catch (Exception e) {
+      } else {
         JOptionPane.showMessageDialog(panel,
-            "Error al eliminar médico: " + e.getMessage(),
+            resultado.getMensaje(),
             "Error", JOptionPane.ERROR_MESSAGE);
       }
     }
   }
 
   private void cargarMedicoEnFormulario() {
-    selectedMedico = medicListForm.getMedicoFromSelectedRow();
-    medicForm.cargarMedico(selectedMedico);
+    selectedMedico = medicListForm.getMedicoDTOFromSelectedRow();
+    medicForm.cargarMedicoDTO(selectedMedico);
   }
 
   private void limpiarFormulario() {
@@ -168,19 +159,11 @@ public class MedicView implements IView {
 
   private void loadMedicos() {
     try {
-      Logger.info("MedicView", "Cargando lista de médicos");
-
-      // Cargar médicos
-      List<MedicoEntity> medicos = medicController.findAll();
-      medicListForm.cargarMedicos(medicos);
-
-      Logger.info("MedicView", "Lista de médicos cargada exitosamente");
-
-    } catch (NoDataFoundException e) {
-      Logger.warn("MedicView", "No se encontraron médicos en la base de datos");
-      medicListForm.limpiarTabla();
+      // Cargar médicos usando el controlador
+      List<MedicoDTO> medicos = medicController.obtenerTodosMedicos();
+      medicListForm.cargarMedicosDTO(medicos);
     } catch (Exception e) {
-      Logger.error("MedicView", "Error al cargar médicos", e);
+      medicListForm.limpiarTabla();
       JOptionPane.showMessageDialog(panel,
           "Error al cargar médicos: " + e.getMessage(),
           "Error", JOptionPane.ERROR_MESSAGE);

@@ -11,11 +11,8 @@ import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import edu.up.controllers.MedicController;
-import edu.up.controllers.dao.IMedicDAO;
-import edu.up.controllers.dao.MedicDAOImpl;
-import edu.up.controllers.service.IMedicService;
-import edu.up.controllers.service.MedicServiceImpl;
+import edu.up.controllers.ApplicationContext;
+import edu.up.ui.forms.LoginForm;
 import edu.up.ui.sections.HeaderSection;
 import edu.up.ui.sections.StatusSection;
 import edu.up.ui.views.AdministrationView;
@@ -23,6 +20,7 @@ import edu.up.ui.views.ConfigurationView;
 import edu.up.ui.views.HomeView;
 import edu.up.ui.views.IView;
 import edu.up.ui.views.MedicView;
+import edu.up.utils.SessionManager;
 
 /**
  * Ventana principal de la aplicación con gestión automática de vistas.
@@ -31,12 +29,21 @@ import edu.up.ui.views.MedicView;
 public class MainFrame extends JFrame {
   private static final String WINDOW_TITLE = "Turnero médico - UP";
   private static final Dimension MIN_WINDOW_SIZE = new Dimension(640, 480);
+  
+  private StatusSection statusSection;
 
   /**
    * Constructor que inicializa la ventana principal y todos sus componentes.
    */
   public MainFrame() {
     super(WINDOW_TITLE);
+
+    // Mostrar login antes de inicializar la ventana
+    if (!mostrarLogin()) {
+      // Si el login falla o se cancela, cerrar la aplicación
+      System.exit(0);
+      return;
+    }
 
     // Variables locales para todo el proceso
     Map<String, IView> viewMap = new HashMap<>();
@@ -54,11 +61,33 @@ public class MainFrame extends JFrame {
 
     // Inicializar componentes
     HeaderSection headerSection = new HeaderSection(mainViews);
-    StatusSection statusSection = new StatusSection(Constants.APP_VERSION, Constants.DEMO_USER);
+    statusSection = new StatusSection(Constants.APP_VERSION, Constants.DEMO_USER);
 
     setupComponents(headerSection, statusSection, contentPanel);
     buildMenu(allViews, headerSection, cardLayout, contentPanel);
     showInitialView(cardLayout, contentPanel, initialView);
+    
+    // Actualizar la barra de estado con la información del usuario autenticado
+    statusSection.actualizarInformacionUsuario();
+  }
+  
+  /**
+   * Muestra el formulario de login
+   * @return true si el login fue exitoso, false en caso contrario
+   */
+  private boolean mostrarLogin() {
+    // Crear una ventana temporal invisible para el login
+    JFrame tempFrame = new JFrame();
+    tempFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+    // Obtener el controlador de login del contexto de aplicación
+    ApplicationContext context = ApplicationContext.getInstance();
+    
+    boolean loginExitoso = LoginForm.mostrarLogin(tempFrame, context.getLoginController());
+    
+    tempFrame.dispose();
+    
+    return loginExitoso;
   }
 
   /**
@@ -72,11 +101,9 @@ public class MainFrame extends JFrame {
     ConfigurationView configView = new ConfigurationView();
     AdministrationView adminView = new AdministrationView();
 
-    // Inicializar DAOs y servicios
-    IMedicDAO medicDAO = new MedicDAOImpl();
-    IMedicService medicService = new MedicServiceImpl(medicDAO);
-    MedicController medicController = new MedicController(medicService);
-    MedicView medicView = new MedicView(medicController);
+    // Obtener controladores del contexto de aplicación
+    ApplicationContext context = ApplicationContext.getInstance();
+    MedicView medicView = new MedicView(context.getMedicController());
 
     // Agregar la vista de médicos a la vista de administración
     adminView.addView(medicView);
@@ -200,5 +227,25 @@ public class MainFrame extends JFrame {
    */
   private void showInitialView(CardLayout cardLayout, JPanel contentPanel, IView initialView) {
     cardLayout.show(contentPanel, initialView.getName());
+  }
+  
+  /**
+   * Actualiza la información de la barra de estado
+   */
+  public void actualizarBarraEstado() {
+    if (statusSection != null) {
+      statusSection.actualizarInformacionUsuario();
+    }
+  }
+  
+  /**
+   * Cierra la sesión y muestra el login nuevamente
+   */
+  public void cerrarSesion() {
+    SessionManager.getInstance().cerrarSesion();
+    dispose();
+    
+    // Crear nueva instancia de MainFrame que mostrará el login
+    new MainFrame().setVisible(true);
   }
 }

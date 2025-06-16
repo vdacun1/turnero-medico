@@ -12,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import edu.up.controllers.dto.MedicoDTO;
 import edu.up.models.entities.MedicoEntity;
 
 /**
@@ -85,6 +86,22 @@ public class MedicListForm {
     }
   }
 
+  public void cargarMedicosDTO(List<MedicoDTO> medicos) {
+    // Limpiar tabla
+    tableModel.setRowCount(0);
+
+    // Cargar médicos
+    for (MedicoDTO medico : medicos) {
+      Object[] row = {
+          medico.getId(),
+          medico.getNombre(),
+          medico.getApellido(),
+          medico.getDni()
+      };
+      tableModel.addRow(row);
+    }
+  }
+
   public void limpiarTabla() {
     tableModel.setRowCount(0);
   }
@@ -112,6 +129,19 @@ public class MedicListForm {
       MedicoEntity medico = new MedicoEntity(nombre, apellido, dni);
       medico.setId(id);
       return medico;
+    }
+    return null;
+  }
+
+  public MedicoDTO getMedicoDTOFromSelectedRow() {
+    int selectedRow = getSelectedRow();
+    if (selectedRow >= 0) {
+      Long id = (Long) getValueAt(selectedRow, 0);
+      String nombre = (String) getValueAt(selectedRow, 1);
+      String apellido = (String) getValueAt(selectedRow, 2);
+      String dni = (String) getValueAt(selectedRow, 3);
+
+      return new MedicoDTO(id, nombre, apellido, dni);
     }
     return null;
   }
